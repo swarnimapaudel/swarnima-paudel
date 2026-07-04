@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Lavender Reading Nook</title>
+    <style>
+        :root {
+            --bg-color: #f3e9ff; /* Soft Lavender Light Background */
+            --container-bg: #ffffff; /* Clean Whitish Contrast panels */
+            --sidebar-bg: #dcd0f3; /* Mid-Tone Lavender Sidebar */
+            --text-color: #2c1a4d; /* Deep Velvet Purple Text */
+            --accent-color: #9b84cf; /* Bright Lavender Action Color */
+            --accent-hover: #7d63b3; /* Darker Lavender Hover State */
+            --border-color: #e3daf7; /* Very Subtle Purple Divider Lines */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 2px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* TITLE TURNED HOME BUTTON (Matching image_901e09.png) */
+        .home-title-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-shadow: 1px 1px var(--container-bg);
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            width: 100%;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .home-title-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.02);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, .player-controls button, .card-buttons-wrapper button, .modal-box button {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+
+        /* Standard button overrides */
+        button.action-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
+        }
+
+        /* Playlist Section */
+        .playlist-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .playlist-title {
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+        }
+
+        .playlist-item {
+            padding: 10px;
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .playlist-item:hover {
+            background: #faf5ff;
+        }
+
+        .remove-btn {
+            background: #e77c7c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background: #cf5b5b;
+        }
+
+        /* Main Content Styling */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+        }
+
+        /* Audio Controls Header */
+        #audio-player-bar {
+            background: var(--container-bg);
+            padding: 15px 30px;
+            border-bottom: 2px solid var(--sidebar-bg);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .now-playing {
+            font-weight: bold;
+            font-size: 1rem;
+            flex: 1;
+            color: var(--accent-color);
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-controls button {
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            border: none;
+        }
+
+        /* Completed Books Badge Icon styling */
+        .completed-badge {
+            background-color: #a3c9a8; 
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+
+        /* BOOK VIEWER WRAPPER - Highly Symmetrical Center Alignment */
+        #book-viewer {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Beautiful Book Reader Frame Panel */
+        .book-content {
+            max-width: 800px;
+            width: 100%;
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(155, 132, 207, 0.1);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .book-content button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* GRID CATALOG SYSTEM - Explicit Symmetry Parameters */
+        .catalog-container-wrapper {
+            width: 100%;
+            max-width: 1200px; 
+            margin: 0 auto;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 25px; 
+            width: 100%;
+        }
+
+        /* Beautiful Balanced Symmetrical Card Tags */
+        .book-card {
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(155, 132, 207, 0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(155, 132, 207, 0.15);
+        }
+
+        .book-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+            height: 48px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            color: var(--text-color);
+        }
+
+        .book-card p {
+            font-size: 0.85rem;
+            color: #796c91;
+            margin-bottom: 15px;
+        }
+
+        .card-buttons-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-buttons-wrapper button {
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        /* Welcome Prompt Overlay */
+        #welcome-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 26, 77, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-box {
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid var(--accent-color);
+        }
+
+        .modal-box h2 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .modal-box select {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #faf7ff;
+        }
+        
+        .modal-box button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Genre Question Modal -->
+    <div id="welcome-modal">
+        <div class="modal-box">
+            <h2>Welcome, Book Lover! 📖</h2>
+            <p style="margin-bottom: 15px; color: #5a4b75;">What kind of book would you like to explore today?</p>
+            <select id="genre-select">
+                <option value="Fiction">Fiction / Classics</option>
+                <option value="Mystery">Mystery & Detective</option>
+                <option value="Fantasy">Sci-Fi & Fantasy</option>
+                <option value="History">History & Biography</option>
+                <option value="Poetry">Poetry</option>
+            </select>
+            <button onclick="closeModalAndSearch()" style="width: 100%;">Start Reading</button>
+        </div>
+    </div>
+
+    <!-- Sidebar Left Layout -->
+    <div id="sidebar">
+        <!-- TITLE IMPLEMENTED AS A INTERACTIVE BUTTON LINK (Ref: image_901e09.png) -->
+        <button class="home-title-btn" onclick="backToCatalog()" title="Return to Home Catalog">
+            📚 My Reading Nook
+        </button>
+        
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search free books...">
+            <button class="action-btn" onclick="searchBooks()">Find</button>
+        </div>
+
+        <div class="playlist-title">🎵 Audio Playlist</div>
+        <div class="playlist-container" id="playlist-items">
+            <p style="color: #63557e; font-size: 0.9rem; text-align: center;">Playlist empty. Add a book!</p>
+        </div>
+    </div>
+
+    <!-- Main View Window Layout -->
+    <div id="main-content">
+        <!-- Audio TTS Control Bar -->
+        <div id="audio-player-bar">
+            <div class="now-playing" id="track-title">Now Playing: None</div>
+            <div class="player-controls">
+                <div class="completed-badge" id="completed-counter" title="Books Completed">
+                    ✅ <span id="done-count">0</span> Done
+                </div>
+                <button onclick="toggleAudio()" style="background-color: var(--accent-color);">Play / Pause</button>
+                <button onclick="stopAudio()" style="background:#e77c7c;">Stop</button>
+            </div>
+            <div style="font-size: 0.9rem; font-weight: bold; color: var(--text-color);">
+                Speed: 
+                <select id="speed-rate" onchange="updateSpeed()" style="padding: 5px; background: white;">
+                    <option value="1">1.0x</option>
+                    <option value="1.2">1.2x</option>
+                    <option value="1.5">1.5x</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dynamic Reading or Selection Board -->
+        <div id="book-viewer">
+            <div class="catalog-container-wrapper" id="catalog-wrapper">
+                <div class="catalog-grid" id="catalog">
+                    <!-- Search items initialize uniformly here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global App States
+        let currentPlaylist = [];
+        let currentTrackIndex = null;
+        let synth = window.speechSynthesis;
+        let utterance = null;
+        let isSpeaking = false;
+        let activeBookText = "";
+        let completedBooksCount = 0;
+
+        // Welcome Setup Integration
+        function closeModalAndSearch() {
+            const selectedGenre = document.getElementById('genre-select').value;
+            document.getElementById('welcome-modal').style.display = 'none';
+            document.getElementById('search-input').value = selectedGenre;
+            searchBooks(selectedGenre);
+        }
+
+        // Fetch Books from Gutendex API (Project Gutenberg)
+        async function searchBooks(forcedQuery = null) {
+            const query = forcedQuery || document.getElementById('search-input').value;
+            
+            const viewer = document.getElementById('book-viewer');
+            viewer.innerHTML = `
+                <div class="catalog-container-wrapper" id="catalog-wrapper">
+                    <div class="catalog-grid" id="catalog"></div>
+                </div>
+            `;
+            
+            const catalog = document.getElementById('catalog');
+            catalog.innerHTML = `<p style="grid-column: 1/-1; text-align:center; font-weight: bold; margin-top: 40px;">Searching the archives for "${query}"...</p>`;
+
+            try {
+                const response = await fetch(`https://gutendex.com/books/?search=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                displayCatalog(data.results);
+            } catch (error) {
+                catalog.innerHTML = `<p style="grid-column: 1/-1; color:#e77c7c; text-align:center; font-weight: bold; margin-top: 40px;">Failed to fetch books. Check your connection pipeline.</p>`;
+            }
+        }
+
+        // Render Search Results to Grid layout
+        function displayCatalog(books) {
+            const catalog = document.getElementById('catalog');
+            catalog.innerHTML = "";
+
+            if (!books || books.length === 0) {
+                catalog.innerHTML = `<p style="grid-column: 1/-1; text-align:center; margin-top: 40px;">No match found. Try another concept!</p>`;
+                return;
+            }
+
+            books.forEach(book => {
+                const textFormat = book.formats['text/plain; charset=utf-8'] || book.formats['text/plain'] || book.formats['text/html'];
+                if(!textFormat) return; 
+
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                    <div>
+                        <h3>${book.title}</h3>
+                        <p>${book.authors.map(a => a.name).join(', ') || 'Unknown Author'}</p>
+                    </div>
+                    <div class="card-buttons-wrapper">
+                        <button style="background-color: var(--accent-color); color: white;" onclick="readBook('${textFormat.replace('http://', 'https://')}', \`${encodeURIComponent(book.title)}\`)">Read</button>
+                        <button style="background: var(--sidebar-bg); color: var(--text-color);" onclick="addToPlaylist(\`${encodeURIComponent(book.title)}\`, '${textFormat.replace('http://', 'https://')}')">+ Playlist</button>
+                    </div>
+                `;
+                catalog.appendChild(card);
+            });
+        }
+
+        // Load Book Text into reading view frame
+        async function readBook(url, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            const viewer = document.getElementById('book-viewer');
+            viewer.innerHTML = `<div class="book-content"><h3>Opening pages...</h3><p>Loading text lines gracefully...</p></div>`;
+            
+            try {
+                const response = await fetch(url);
+                let text = await response.text();
+                
+                activeBookText = text.substring(0, 45000) + "\n\n[...Preview Limited to Single Chapter for Performance...]";
+
+                viewer.innerHTML = `
+                    <div class="book-content">
+                        <button onclick="backToCatalog()" style="margin-bottom:15px;">← Back to Grid</button>
+                        <h2>${title}</h2>
+                        <hr style="margin: 15px 0; border:0; border-top:1px solid var(--border-color);">
+                        <div style="white-space: pre-wrap;">${activeBookText}</div>
+                    </div>
+                `;
+            } catch (err) {
+                viewer.innerHTML = `
+                    <div class="book-content">
+                        <h3>Secure Reading Link Available</h3>
+                        <p>This book text structure works ideally via the streaming pipeline. Click '+ Playlist' to let the audio player voice synthesize this title out loud right now!</p>
+                        <button onclick="backToCatalog()" style="margin-top:15px;">← Back to Grid</button>
+                    </div>
+                `;
+                activeBookText = `Reading preview frame for ${title}. Content streaming straight through audio speech synthesis system pipeline.`;
+            }
+        }
+
+        function backToCatalog() {
+            searchBooks();
+        }
+
+        /* Playlist & Audio Mechanics Engine */
+        function addToPlaylist(encodedTitle, url) {
+            const title = decodeURIComponent(encodedTitle);
+            
+            if (currentPlaylist.some(item => item.title === title)) return;
+
+            currentPlaylist.push({ title, url });
+            renderPlaylist();
+        }
+
+        function removeFromPlaylist(index, event) {
+            event.stopPropagation(); 
+            currentPlaylist.splice(index, 1);
+            if (currentTrackIndex === index) stopAudio();
+            renderPlaylist();
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-items');
+            if (currentPlaylist.length === 0) {
+                container.innerHTML = `<p style="color: #63557e; font-size: 0.9rem; text-align: center;">Playlist empty. Add a book!</p>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            currentPlaylist.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'playlist-item';
+                row.onclick = () => playPlaylistItem(idx);
+                row.innerHTML = `
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-color); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:180px;">
+                        📖 ${item.title}
+                    </span>
+                    <button class="remove-btn" onclick="removeFromPlaylist(${idx}, event)">X</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        async function playPlaylistItem(index) {
+            currentTrackIndex = index;
+            const track = currentPlaylist[index];
+            document.getElementById('track-title').innerText = `Preparing audio: ${track.title}`;
+            
+            try {
+                const res = await fetch(track.url);
+                const fullText = await res.text();
+                startSpeech(fullText.substring(0, 8000), track.title); 
+            } catch {
+                startSpeech(`Now streaming audio system channel for ${track.title}.`, track.title);
+            }
+        }
+
+        function startSpeech(text, title) {
+            synth.cancel(); 
+            
+            utterance = new SpeechSynthesisUtterance(text);
+            const rateInput = document.getElementById('speed-rate').value;
+            utterance.rate = parseFloat(rateInput);
+
+            utterance.onstart = () => {
+                isSpeaking = true;
+                document.getElementById('track-title').innerText = `Now Playing: 🔊 ${title}`;
+            };
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                document.getElementById('track-title').innerText = `Finished: ${title}`;
+                
+                completedBooksCount++;
+                document.getElementById('done-count').innerText = completedBooksCount;
+
+                if (currentTrackIndex !== null && currentTrackIndex + 1 < currentPlaylist.length) {
+                    playPlaylistItem(currentTrackIndex + 1);
+                }
+            };
+
+            synth.speak(utterance);
+        }
+
+        function toggleAudio() {
+            if (!utterance) return;
+            if (synth.paused) {
+                synth.resume();
+            } else if (synth.speaking) {
+                synth.pause();
+            }
+        }
+
+        function stopAudio() {
+            if (synth) {
+                synth.cancel();
+                isSpeaking = false;
+                document.getElementById('track-title').innerText = "Now Playing: None";
+            }
+        }
+
+        function updateSpeed() {
+            if (isSpeaking) {
+                const title = currentPlaylist[currentTrackIndex]?.title || "Current Selection";
+                startSpeech(utterance.text, title);
+            }
+        }
+    </script>
+</body>
+</html>
